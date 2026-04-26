@@ -1,0 +1,1027 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gideon Moses — Flutter Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f2ed;
+    --cream: #ede8df;
+    --accent: #e8ff47;
+    --accent2: #47c5ff;
+    --gray: #888;
+    --card: #141414;
+    --border: #222;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: difference;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.3s ease;
+    mix-blend-mode: difference;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    z-index: 100;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    border-color: var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: var(--white);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a {
+    font-size: 12px;
+    color: var(--gray);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg-number {
+    position: absolute;
+    top: 50%;
+    right: -40px;
+    transform: translateY(-50%);
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(200px, 35vw, 500px);
+    font-weight: 800;
+    color: transparent;
+    -webkit-text-stroke: 1px #1e1e1e;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    animation: floatNum 8s ease-in-out infinite;
+  }
+
+  @keyframes floatNum {
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    50% { transform: translateY(-52%) translateX(-10px); }
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1.5px;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-name em {
+    font-style: italic;
+    font-family: 'Instrument Serif', serif;
+    color: var(--accent);
+  }
+
+  .hero-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-desc {
+    max-width: 380px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--gray);
+  }
+
+  .hero-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-end;
+  }
+  .hero-links a {
+    font-size: 12px;
+    color: var(--gray);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-links a:hover { color: var(--accent); }
+  .hero-links a::after {
+    content: '↗';
+    font-size: 10px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    opacity: 0;
+    animation: fadeIn 1s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  /* SECTIONS */
+  section {
+    padding: 120px 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 64px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 72px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    margin-bottom: 64px;
+  }
+  .section-title em {
+    font-style: italic;
+    font-family: 'Instrument Serif', serif;
+    color: var(--accent);
+  }
+
+  /* ABOUT */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-text {
+    font-size: 15px;
+    line-height: 2;
+    color: #aaa;
+  }
+  .about-text strong { color: var(--white); }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  .stat-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 32px 24px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .stat-box:hover {
+    border-color: var(--accent);
+    background: #1a1a0a;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  /* APPS / PROJECTS */
+  .apps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .app-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+  .app-card:hover { border-color: var(--accent); }
+  .app-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .app-card:hover::before { transform: scaleX(1); }
+
+  .app-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    margin-bottom: 24px;
+  }
+  .app-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: #1e1e1e;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  .app-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .app-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--gray);
+    margin-bottom: 24px;
+    flex: 1;
+  }
+  .app-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .tag {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--gray);
+    border-radius: 2px;
+  }
+  .app-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .store-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    color: var(--gray);
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .store-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(232,255,71,0.05);
+  }
+  .store-btn.ios { border-color: #333; }
+  .store-btn.android { border-color: #333; }
+
+  /* SKILLS */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+  }
+  .skill-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 36px 32px;
+  }
+  .skill-group-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .skill-pill {
+    font-size: 12px;
+    padding: 6px 12px;
+    background: #1e1e1e;
+    border: 1px solid var(--border);
+    color: #ccc;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .skill-pill:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* EXPERIENCE */
+  .exp-list { display: flex; flex-direction: column; gap: 2px; }
+  .exp-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 36px 40px;
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: 40px;
+    align-items: start;
+    transition: border-color 0.3s;
+  }
+  .exp-item:hover { border-color: var(--accent); }
+  .exp-date {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--gray);
+    padding-top: 4px;
+  }
+  .exp-role {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .exp-company {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .exp-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--gray);
+  }
+  .exp-type {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--gray);
+    white-space: nowrap;
+    height: fit-content;
+  }
+
+  /* CONTACT */
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .contact-text {
+    font-size: 14px;
+    line-height: 2;
+    color: var(--gray);
+  }
+  .contact-links { display: flex; flex-direction: column; gap: 2px; }
+  .contact-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--white);
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    transition: all 0.3s;
+  }
+  .contact-link:hover {
+    background: var(--accent);
+    color: var(--black);
+    border-color: var(--accent);
+  }
+  .contact-link span { font-size: 18px; }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 0.08em;
+  }
+
+  /* REVEAL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 0 24px 60px; }
+    .hero-bg-number { font-size: 160px; right: -20px; }
+    .hero-bottom { flex-direction: column; gap: 32px; align-items: flex-start; }
+    .hero-links { align-items: flex-start; }
+    section { padding: 80px 24px; }
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    .apps-grid { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .exp-item { grid-template-columns: 1fr; gap: 12px; }
+    .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">GM<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#apps">Apps</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg-number">4+</div>
+  <div class="hero-tag">Available for work · Flutter Engineer</div>
+  <h1 class="hero-name">
+    Chukwuezuwom<br>
+    <em>Gideon</em> Moses
+  </h1>
+  <div class="hero-bottom">
+    <p class="hero-desc">
+      Senior Flutter & Mobile Engineer with 4+ years building production-grade cross-platform applications. Specialist in clean architecture, state management, and full-stack mobile solutions shipped to millions of users.
+    </p>
+    <div class="hero-links">
+      <a href="https://github.com/Mosesgideon" target="_blank">GitHub</a>
+      <a href="https://www.linkedin.com/in/chukwuezuwom-gideon-a35a5a258" target="_blank">LinkedIn</a>
+      <a href="Gideon_Moses_CV.pdf" download="Gideon_Moses_CV.pdf" style="color:var(--accent);border:1px solid var(--accent);padding:6px 14px;border-radius:2px;font-size:12px;letter-spacing:0.08em;text-decoration:none;display:flex;align-items:center;gap:6px;transition:all 0.2s;" onmouseover="this.style.background='rgba(232,255,71,0.1)'" onmouseout="this.style.background='transparent'">↓ Download CV</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">01 — About</div>
+  <div class="about-grid reveal">
+    <div>
+      <h2 class="section-title">Building apps <em>people</em> actually use.</h2>
+      <p class="about-text">
+        I'm a <strong>Senior Flutter & Mobile Engineer</strong> based remotely, with over 4 years of intensive experience shipping cross-platform mobile applications to both the <strong>App Store and Google Play</strong>.<br><br>
+        I work across the full mobile stack — from pixel-perfect UI to REST API integration, Firebase architecture, payment gateway implementation, and CI/CD pipelines. Every app I've shipped has been built with <strong>SOLID principles, clean architecture, and a product-first mindset</strong>.<br><br>
+        I thrive in fast-moving startup environments where ownership is expected, ambiguity is normal, and quality is non-negotiable.
+      </p>
+    </div>
+    <div class="about-stats">
+      <div class="stat-box">
+        <div class="stat-num">4+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">8+</div>
+        <div class="stat-label">Apps Shipped</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Companies Worked With</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Stores Deployed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- APPS -->
+<section id="apps">
+  <div class="section-label">02 — Live Apps</div>
+  <h2 class="section-title reveal">Shipped to <em>production.</em></h2>
+  <div class="apps-grid">
+
+    <div class="app-card reveal">
+      <div class="app-num">001</div>
+      <div class="app-icon">🛒</div>
+      <div class="app-name">HEZMART</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;">HEZMART · Jun 2025 – Aug 2025</div>
+      <p class="app-desc">
+        E-commerce platform supporting fiat and crypto payments, real-time cart management, vendor portals with profiles, catalogs and ratings, and secure order processing at high transaction volumes.
+      </p>
+      <div class="app-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Firebase</span>
+        <span class="tag">Crypto</span>
+        <span class="tag">E-Commerce</span>
+        <span class="tag">Payments</span>
+      </div>
+      <div class="app-links">
+        <a href="https://play.google.com/store/apps/details?id=com.hezmart.app" target="_blank" class="store-btn android">▶ Play Store</a>
+        <a href="https://apps.apple.com/app/hezmart/id6751547294" target="_blank" class="store-btn ios"> App Store</a>
+      </div>
+    </div>
+
+    <div class="app-card reveal">
+      <div class="app-num">002</div>
+      <div class="app-icon">🛍️</div>
+      <div class="app-name">WorkAndShop</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;">Beyond Tech · Feb 2025 – Jun 2025</div>
+      <p class="app-desc">
+        Multi-vendor e-commerce Flutter app delivered from concept to MVP launch. Built with Clean Architecture and BLoC. Features dynamic vendor onboarding, secure file uploads, and a subscription-based payment gateway.
+      </p>
+      <div class="app-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">BLoC</span>
+        <span class="tag">Clean Arch</span>
+        <span class="tag">Multi-vendor</span>
+        <span class="tag">Subscriptions</span>
+      </div>
+      <div class="app-links">
+        <a href="https://play.google.com/store/apps/details?id=com.Workandshopapp.app" target="_blank" class="store-btn android">▶ Play Store</a>
+        <a href="https://apps.apple.com/app/workandshop/id6745738695" target="_blank" class="store-btn ios"> App Store</a>
+      </div>
+    </div>
+
+    <div class="app-card reveal">
+      <div class="app-num">003</div>
+      <div class="app-icon">⛽</div>
+      <div class="app-name">Borofuel</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;">Beyond Tech · Oct 2025 – Dec 2025</div>
+      <p class="app-desc">
+        Driver-assistance and fuel-support platform for registered company drivers and partner fuel stations. Features real-time fuel request flows, approval tracking, secure driver verification, and live transaction processing.
+      </p>
+      <div class="app-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Real-time</span>
+        <span class="tag">REST APIs</span>
+        <span class="tag">Driver Tech</span>
+        <span class="tag">Firebase</span>
+      </div>
+      <div class="app-links">
+        <a href="https://play.google.com/store/apps/details?id=com.borofuel.app" target="_blank" class="store-btn android">▶ Play Store</a>
+        <a href="https://apps.apple.com/app/borofuel/id6755387996" target="_blank" class="store-btn ios"> App Store</a>
+      </div>
+    </div>
+
+    <div class="app-card reveal">
+      <div class="app-num">004</div>
+      <div class="app-icon">🤖</div>
+      <div class="app-name">PollSensei</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;">De-Developer · Jun 2024 – Dec 2024</div>
+      <p class="app-desc">
+        AI-powered survey creation and analytics tool. Users generate questions with AI assistance, collect responses including audio, view real-time analytics, and distribute surveys via email and social media. Integrated Stripe, Flutterwave, and Paystack.
+      </p>
+      <div class="app-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">AI</span>
+        <span class="tag">Analytics</span>
+        <span class="tag">Payments</span>
+        <span class="tag">Cross-platform</span>
+      </div>
+      <div class="app-links">
+        <span class="store-btn" style="opacity:0.5; cursor:default;">🔒 Company App</span>
+      </div>
+    </div>
+
+    <div class="app-card reveal">
+      <div class="app-num">005</div>
+      <div class="app-icon">🎮</div>
+      <div class="app-name">Dap Game</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;">Programmer's City · Mar 2024 – Jun 2024</div>
+      <p class="app-desc">
+        Real-money competitive mobile game built with Flutter. Players compete for cash prizes with engaging gameplay mechanics, clean Dart code, and third-party integrations for game logic and payments.
+      </p>
+      <div class="app-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Dart</span>
+        <span class="tag">Gaming</span>
+        <span class="tag">Real-money</span>
+      </div>
+      <div class="app-links">
+        <span class="store-btn" style="opacity:0.5; cursor:default;">🔒 Company App</span>
+      </div>
+    </div>
+
+    <div class="app-card reveal">
+      <div class="app-num">006</div>
+      <div class="app-icon">📦</div>
+      <div class="app-name">PackageMe</div>
+      <div style="font-size:11px;color:var(--accent);letter-spacing:0.08em;margin-bottom:12px;">Freelance · Jan 2026 – Mar 2026</div>
+      <p class="app-desc">
+        Full-stack e-commerce platform for curated event packages — birthdays, anniversaries, Christmas and more. Built solo: Flutter frontend, Django REST backend, multi-tier vendor pricing, and a complete notification system.
+      </p>
+      <div class="app-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Django</span>
+        <span class="tag">Full-Stack</span>
+        <span class="tag">E-commerce</span>
+        <span class="tag">Push Notifs</span>
+      </div>
+      <div class="app-links">
+        <span class="store-btn" style="opacity:0.5; cursor:default;">🔒 Learning Project</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">03 — Skills</div>
+  <h2 class="section-title reveal">The <em>stack.</em></h2>
+  <div class="skills-grid reveal">
+    <div class="skill-group">
+      <div class="skill-group-title">Mobile Development</div>
+      <div class="skill-list">
+        <span class="skill-pill">Flutter</span>
+        <span class="skill-pill">Dart</span>
+        <span class="skill-pill">iOS</span>
+        <span class="skill-pill">Android</span>
+        <span class="skill-pill">Cross-platform</span>
+        <span class="skill-pill">Mobile UI/UX</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Architecture & Patterns</div>
+      <div class="skill-list">
+        <span class="skill-pill">SOLID Principles</span>
+        <span class="skill-pill">Clean Architecture</span>
+        <span class="skill-pill">BLoC</span>
+        <span class="skill-pill">Riverpod</span>
+        <span class="skill-pill">Provider</span>
+        <span class="skill-pill">GetX</span>
+        <span class="skill-pill">Design Patterns</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Backend & APIs</div>
+      <div class="skill-list">
+        <span class="skill-pill">RESTful APIs</span>
+        <span class="skill-pill">Django (Python)</span>
+        <span class="skill-pill">Firebase Auth</span>
+        <span class="skill-pill">Firestore</span>
+        <span class="skill-pill">Cloud Functions</span>
+        <span class="skill-pill">FCM</span>
+        <span class="skill-pill">Push Notifications</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Payments & Integrations</div>
+      <div class="skill-list">
+        <span class="skill-pill">Paystack</span>
+        <span class="skill-pill">Flutterwave</span>
+        <span class="skill-pill">Stripe</span>
+        <span class="skill-pill">Crypto</span>
+        <span class="skill-pill">Hive</span>
+        <span class="skill-pill">Shared Preferences</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">Quality & Testing</div>
+      <div class="skill-list">
+        <span class="skill-pill">TDD</span>
+        <span class="skill-pill">Unit Testing</span>
+        <span class="skill-pill">Widget Testing</span>
+        <span class="skill-pill">Integration Testing</span>
+        <span class="skill-pill">Crashlytics</span>
+        <span class="skill-pill">Performance Profiling</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-title">DevOps & Tools</div>
+      <div class="skill-list">
+        <span class="skill-pill">GitHub Actions</span>
+        <span class="skill-pill">CI/CD</span>
+        <span class="skill-pill">App Store Connect</span>
+        <span class="skill-pill">Play Console</span>
+        <span class="skill-pill">Git</span>
+        <span class="skill-pill">Figma</span>
+        <span class="skill-pill">VS Code</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">04 — Experience</div>
+  <h2 class="section-title reveal">Where I've <em>built.</em></h2>
+  <div class="exp-list">
+    <div class="exp-item reveal">
+      <div class="exp-date">Jan 2026 – Mar 2026</div>
+      <div>
+        <div class="exp-role">Full-Stack Mobile Engineer</div>
+        <div class="exp-company">PackageMe — Freelance</div>
+        <p class="exp-desc">Architected and owned full-stack development of PackageMe solo — Flutter frontend, Django REST backend, multi-tier vendor marketplace, and a complete notification system for email and push.</p>
+      </div>
+      <div class="exp-type">Freelance</div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-date">Oct 2025 – Dec 2025</div>
+      <div>
+        <div class="exp-role">Senior Mobile Engineer</div>
+        <div class="exp-company">Beyond Tech — Borofuel</div>
+        <p class="exp-desc">Led architecture and development of Borofuel, a driver-assistance and fuel-support platform. Built real-time request flows, secure driver verification, and deployed to both stores.</p>
+      </div>
+      <div class="exp-type">Full-time</div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-date">Jun 2024 – Dec 2024</div>
+      <div>
+        <div class="exp-role">Senior Mobile Engineer</div>
+        <div class="exp-company">De-Developer — PollSensei</div>
+        <p class="exp-desc">Built PollSensei, an AI-powered survey creation and analytics tool. Integrated Stripe, Flutterwave, Paystack. Delivered real-time analytics, audio responses, and AI-assisted survey generation.</p>
+      </div>
+      <div class="exp-type">Remote</div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-date">Jun 2025 – Aug 2025</div>
+      <div>
+        <div class="exp-role">Senior Mobile Engineer</div>
+        <div class="exp-company">HEZMART</div>
+        <p class="exp-desc">Owned architecture of an e-commerce app supporting fiat and crypto payments. Engineered real-time cart, vendor portal, and two payment gateway integrations at high reliability.</p>
+      </div>
+      <div class="exp-type">Contract</div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-date">Feb 2025 – Jun 2025</div>
+      <div>
+        <div class="exp-role">Senior Mobile Engineer</div>
+        <div class="exp-company">Beyond Tech — WorkAndShop</div>
+        <p class="exp-desc">Spearheaded end-to-end development of WorkAndShop using Clean Architecture and BLoC. Delivered full MVP to both stores, set codebase standards, and implemented subscription payments.</p>
+      </div>
+      <div class="exp-type">Full-time</div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-date">Mar 2023 – Jun 2024</div>
+      <div>
+        <div class="exp-role">Mobile Developer (Mid-level)</div>
+        <div class="exp-company">Programmer's City</div>
+        <p class="exp-desc">Joined Mar 2023, initially maintaining and updating existing production apps. Later engineered Dap Game (Mar–Jun 2024) — a real-money competitive mobile application with engaging gameplay mechanics and third-party integrations.</p>
+      </div>
+      <div class="exp-type">Onsite</div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-date">Mar 2022 – Dec 2022</div>
+      <div>
+        <div class="exp-role">Mobile Developer (Intern)</div>
+        <div class="exp-company">LiteResults Services — ShapCab</div>
+        <p class="exp-desc">Built ShapCab, a Bolt-like ride-hailing app. Integrated Google Maps, contributed to Flutter architecture, and supported integration and UI testing alongside cross-functional teams.</p>
+      </div>
+      <div class="exp-type">Intern</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">05 — Contact</div>
+  <div class="contact-inner reveal">
+    <div>
+      <h2 class="section-title">Let's <em>build</em> something.</h2>
+      <p class="contact-text">
+        Open to senior Flutter roles, contracts, and freelance projects. I work remotely and am available immediately. Drop me a line — I respond fast.
+      </p>
+    </div>
+    <div class="contact-links">
+      <a href="https://www.linkedin.com/in/chukwuezuwom-gideon-a35a5a258" target="_blank" class="contact-link">
+        LinkedIn <span>↗</span>
+      </a>
+      <a href="https://github.com/Mosesgideon" target="_blank" class="contact-link">
+        GitHub <span>↗</span>
+      </a>
+      <a href="mailto:mosesgideon072@gmail.com" class="contact-link">
+        mosesgideon072@gmail.com <span>✉</span>
+      </a>
+      <a href="Gideon_Moses_CV.pdf" download="Gideon_Moses_CV.pdf" class="contact-link" style="background:var(--accent);color:var(--black);border-color:var(--accent);">
+        Download CV <span>↓</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 Chukwuezuwom Gideon Moses</span>
+  <span>Flutter Engineer · Available for Work</span>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    cursorRing.style.left = rx + 'px';
+    cursorRing.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.style.transform = 'scale(2.5)');
+    el.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+  });
+
+  // Nav scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
